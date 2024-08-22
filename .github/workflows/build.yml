@@ -17,7 +17,7 @@ jobs:
           # MacOS ARM64
           - macos-14
           # Linux x86_64
-          - ubuntu-24.04
+          - ubuntu-22.04
 
         ocaml-compiler:
           # Test the oldest OCaml version and the two newest versions.
@@ -31,7 +31,6 @@ jobs:
         if: runner.os == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install darcs
 
       - name: Checkout code
         uses: actions/checkout@v4
