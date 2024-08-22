@@ -14,14 +14,12 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          # MacOS ARM64
-          - macos-14
           # Linux x86_64
-          - ubuntu-22.04
+          - ubuntu-latest
+          - ubuntu-24.04
 
         ocaml-compiler:
           # Test the oldest OCaml version and the two newest versions.
-          - 4.14
           - 5.2
 
     runs-on: ${{ matrix.os }}
@@ -31,6 +29,7 @@ jobs:
         if: runner.os == 'linux'
         run: |
           sudo apt-get update
+          sudo apt-cache search darcs
 
       - name: Checkout code
         uses: actions/checkout@v4
