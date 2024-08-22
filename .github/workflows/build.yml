@@ -29,7 +29,9 @@ jobs:
     steps:
       - name: Update Ubuntu
         if: runner.os == 'linux'
-        run: sudo apt-get update
+        run: |
+          sudo apt-get update
+          sudo apt-get install darcs
 
       - name: Checkout code
         uses: actions/checkout@v4
