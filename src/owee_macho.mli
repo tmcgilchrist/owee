@@ -1,5 +1,8 @@
 open Owee_buf
 
+(** Mach-O object file decoder. *)
+
+(** Mach magic number identifier *)
 type magic =
   | MAGIC32
   | MAGIC64
@@ -10,6 +13,7 @@ val string_of_magic : magic -> string
 
 type unknown = [ `Unknown of int ]
 
+(** Mach cpu specifier *)
 type cpu_type = [
   | `X86
   | `X86_64
@@ -21,6 +25,7 @@ type cpu_type = [
   | unknown
 ]
 
+(** Mach machine specifier *)
 type cpu_subtype = [
   | `Intel
   | `I386_ALL
@@ -66,22 +71,39 @@ type cpu_subtype = [
   | `ARM_ALL
   | `ARM_V4T
   | `ARM_V6
+  | `ARM_V5TEJ
+  | `ARM_XSCALE
+  | `ARM_V7                     (* ARMv7-A and ARMv7-R  *)
+  | `ARM_V7F                    (* Cortex A9 *)
+  | `ARM_V7S                    (* Swift *)
+  | `ARM_V7K
+  | `ARM_V8
   | unknown
 ]
 
+(** Constants for the [file_type] field of the mach [header]. *)
 type file_type = [
-  | `OBJECT
-  | `EXECUTE
-  | `CORE
-  | `PRELOAD
-  | `DYLIB
-  | `DYLINKER
-  | `BUNDLE
-  | `DYLIB_STUB
-  | `DSYM
+  | `OBJECT                     (* relocatable object file *)
+  | `EXECUTE                    (* demand paged executable file *)
+  | `FVMLIB                     (* fixed VM shared library file *)
+  | `CORE                       (* core file *)
+  | `PRELOAD                    (* preloaded executable file *)
+  | `DYLIB                      (* dynamically bound shared library *)
+  | `DYLINKER                   (* dynamic link editor *)
+  | `BUNDLE                     (* dynamically bound bundle file *)
+  | `DYLIB_STUB                 (* shared library stub for static
+                                   linking only, no section contents *)
+  | `DSYM                       (* companion file with only debug sections *)
+  | `KEXT_BUNDLE                (* x86_64 kexts *)
+  | `FILESET                    (* a file composed of other Mach-Os to
+                                   be run in the same userspace sharing
+                                   a single linkedit. *)
+  | `GPU_EXECUTE                (* gpu program  *)
+  | `GPU_DYLIB                  (* gpu support functions *)
   | unknown
 ]
 
+(** Constants for the [flags] field of the mach [header] *)
 type header_flag = [
   (*  the object file has no undefined references *)
   | `NOUNDEFS
@@ -127,6 +149,9 @@ type header_flag = [
   | `PIE
 ]
 
+(** Mach header
+
+    Appears at the very beginning of Mach-O object files. *)
 type header = {
   magic : magic;
   cpu_type : cpu_type;
@@ -479,6 +504,9 @@ type dylib = {
   dylib_compatibility_version: u32;
 }
 
+(** Load commands
+
+    The load commands directly follow the mach_header. *)
 type command =
   (* segment of this file to be mapped *)
   | LC_SEGMENT_32 of segment lazy_t
@@ -530,6 +558,8 @@ type command =
   | LC_SEGMENT_SPLIT_INFO of u32 * u32
   | LC_UNHANDLED of int * Owee_buf.t
 
+(** From a buffer pointing to a MachO image, [read] decodes the header and load [command] list.  *)
 val read : Owee_buf.t -> header * command list
 
+(** From a buffer pointing to a MachO image, [section_body macho segment section] returns a sub-buffer with the contents of the [section] of the MachO image. *)
 val section_body : Owee_buf.t -> segment -> section -> Owee_buf.t

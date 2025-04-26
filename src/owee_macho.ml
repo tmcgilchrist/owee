@@ -100,6 +100,13 @@ type cpu_subtype = [
   | `ARM_ALL
   | `ARM_V4T
   | `ARM_V6
+  | `ARM_V5TEJ
+  | `ARM_XSCALE
+  | `ARM_V7
+  | `ARM_V7F
+  | `ARM_V7S
+  | `ARM_V7K
+  | `ARM_V8
   | unknown
 ]
 
@@ -153,11 +160,19 @@ let cpu_subtype ty tag = match ty, tag with
   | `ARM       , 0   -> `ARM_ALL
   | `ARM       , 5   -> `ARM_V4T
   | `ARM       , 6   -> `ARM_V6
+  | `ARM       , 7   -> `ARM_V5TEJ
+  | `ARM       , 8   -> `ARM_XSCALE
+  | `ARM       , 9   -> `ARM_V7
+  | `ARM       , 10  -> `ARM_V7F
+  | `ARM       , 11  -> `ARM_V7S
+  | `ARM       , 12  -> `ARM_V7K
+  | `ARM       , 13  -> `ARM_V8
   | _         , n    -> `Unknown n
 
 type file_type = [
   | `OBJECT
   | `EXECUTE
+  | `FVMLIB
   | `CORE
   | `PRELOAD
   | `DYLIB
@@ -165,12 +180,17 @@ type file_type = [
   | `BUNDLE
   | `DYLIB_STUB
   | `DSYM
+  | `KEXT_BUNDLE
+  | `FILESET
+  | `GPU_EXECUTE
+  | `GPU_DYLIB
   | unknown
 ]
 
 let file_type = function
   | 0x1 -> `OBJECT
   | 0x2 -> `EXECUTE
+  | 0x3 -> `FVMLIB
   | 0x4 -> `CORE
   | 0x5 -> `PRELOAD
   | 0x6 -> `DYLIB
@@ -178,6 +198,10 @@ let file_type = function
   | 0x8 -> `BUNDLE
   | 0x9 -> `DYLIB_STUB
   | 0xA -> `DSYM
+  | 0xB -> `KEXT_BUNDLE
+  | 0xC -> `FILESET
+  | 0xD -> `GPU_EXECUTE
+  | 0xE -> `GPU_DYLIB
   | n   -> `Unknown n
 
 type header_flag = [

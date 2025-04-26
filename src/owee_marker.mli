@@ -112,6 +112,7 @@ type 'a marker
 module Unsafe0 (M : T0) : sig
   (** The marker should only appear as a field of an object of type [M.t].
 
+{[
       type t = {
         ...;
         marker: M.t marker; (* Correct *)
@@ -125,7 +126,7 @@ module Unsafe0 (M : T0) : sig
         | Normal of ...
         | Marked of (... * M.t marker)
           (* Wrong: marker is part of the tuple, not of the value of type [t] *)
-
+]}
   *)
   val marker : M.t marker
 end
