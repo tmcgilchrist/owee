@@ -161,20 +161,30 @@ type header = {
 }
 
 type reloc_type = [
-  | `GENERIC_RELOC_VANILLA
-  | `GENERIC_RELOC_PAIR
+  (* Generic relocation types.
+     mach-o/reloc.h *)
+
+  | `GENERIC_RELOC_VANILLA (** Generic relocation as described above *)
+  | `GENERIC_RELOC_PAIR    (** Only follows a [`GENERIC_RELOC_SECTDIFF] *)
   | `GENERIC_RELOC_SECTDIFF
+  | `GENERIC_RELOC_PB_LA_PTR    (** Pre-bound lazy pointer *)
   | `GENERIC_RELOC_LOCAL_SECTDIFF
-  | `GENERIC_RELOC_PB_LA_PTR
-  | `X86_64_RELOC_BRANCH
-  | `X86_64_RELOC_GOT_LOAD
-  | `X86_64_RELOC_GOT
-  | `X86_64_RELOC_SIGNED
-  | `X86_64_RELOC_UNSIGNED
-  | `X86_64_RELOC_SUBTRACTOR
-  | `X86_64_RELOC_SIGNED_1
-  | `X86_64_RELOC_SIGNED_2
-  | `X86_64_RELOC_SIGNED_4
+  | `GENERIC_RELOC_TLV          (** thread local variables  *)
+
+  | `X86_64_RELOC_BRANCH        (** a CALL/JMP instruction with 32-bit displacement *)
+  | `X86_64_RELOC_GOT_LOAD      (** a MOVQ load of a GOT entry *)
+  | `X86_64_RELOC_GOT           (** must be followed by a X86_64_RELOC_UNSIGNED *)
+  | `X86_64_RELOC_SIGNED        (** for signed 32-bit displacement *)
+  | `X86_64_RELOC_UNSIGNED      (** for absolute addresses *)
+  | `X86_64_RELOC_SUBTRACTOR    (** must be followed by a X86_64_RELOC_UNSIGNED *)
+  | `X86_64_RELOC_SIGNED_1      (** for signed 32-bit displacement with a -1 addend *)
+  | `X86_64_RELOC_SIGNED_2      (** for signed 32-bit displacement with a -2 addend *)
+  | `X86_64_RELOC_SIGNED_4      (** for signed 32-bit displacement with a -4 addend *)
+  | `X86_64_RELOC_TLV           (** thread local variables *)
+
+  (* Relocation types used in the PPC implementation.
+     mach-o/ppc/reloc.h *)
+
   | `PPC_RELOC_VANILLA
   | `PPC_RELOC_PAIR
   | `PPC_RELOC_BR14
@@ -191,6 +201,35 @@ type reloc_type = [
   | `PPC_RELOC_HA16_SECTDIFF
   | `PPC_RELOC_JBSR
   | `PPC_RELOC_LO14_SECTDIFF
+
+  (* Relocation types used in the arm implementation.
+      mach-o/arm/reloc.h *)
+  | `ARM_RELOC_VANILLA          (** Generic relocation as described above *)
+  | `ARM_RELOC_PAIR             (** the second relocation entry of a pair *)
+  | `ARM_RELOC_SECTDIFF         (** a PAIR follows with subtract symbol value *)
+  | `ARM_RELOC_LOCAL_SECTDIFF   (** like [`ARM_RELOC_SECTDIFF], but the symbol referenced was local. *)
+  | `ARM_RELOC_PB_LA_PTR        (** prebound lazy pointer *)
+  | `ARM_RELOC_BR24             (** 24 bit branch displacement (to a word address) *)
+  | `ARM_THUMB_RELOC_BR22       (** 22 bit branch displacement (to a half-word address) *)
+  | `ARM_THUMB_32BIT_BRANCH     (** obsolete - a thumb 32-bit branch instruction
+                                    possibly needing page-spanning branch workaround  *)
+  | `ARM_RELOC_HALF
+  | `ARM_RELOC_HALF_SECTDIFF
+
+  (* Relocation types used in the arm implementation.
+      mach-o/arm64/reloc.h *)
+  | `ARM64_RELOC_UNSIGNED                 (** For pointer sized fixups *)
+  | `ARM64_RELOC_SUBTRACTOR               (** Must be followed by a ARM64_RELOC_UNSIGNED *)
+  | `ARM64_RELOC_BRANCH26                 (** a BL instruction with pc-relative +-128MB displacement *)
+  | `ARM64_RELOC_PAGE21                   (** pc-rel distance to page of target *)
+  | `ARM64_RELOC_PAGEOFF12                (** offset within page, scaled by r_length *)
+  | `ARM64_RELOC_GOT_LOAD_PAGE21          (** load with a pc-rel distance to page of a GOT entry *)
+  | `ARM64_RELOC_GOT_LOAD_PAGEOFF12       (** load with an offset within page, scaled by r_length, of GOT entry *)
+  | `ARM64_RELOC_POINTER_TO_GOT           (** 32-bit pc-rel (or 64-bit absolute) offset to a GOT entry *)
+  | `ARM64_RELOC_TLVP_LOAD_PAGE21         (** tlv load with a pc-rel distance to page of a GOT entry *)
+  | `ARM64_RELOC_TLVP_LOAD_PAGEOFF12      (** tlv load with an offset within page, scaled by r_length, of GOT entry *)
+  | `ARM64_RELOC_ADDEND                   (** must be followed by ARM64_RELOC_BRANCH26/ARM64_RELOC_PAGE21/ARM64_RELOC_PAGEOFF12 *)
+  | `ARM64_RELOC_AUTHENTICATED_POINTER    (** 64-bit pointer with authentication *)
   | unknown
 ]
 
